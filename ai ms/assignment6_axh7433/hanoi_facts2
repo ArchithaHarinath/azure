@@ -1,0 +1,15 @@
+(A Peg)
+(B Peg)
+(C Peg)
+(d1 Disk)
+(d2 Disk)
+(d3 Disk)
+(d4 Disk)
+(d5 Disk)
+
+(preconds
+ (on d1 d2) (on d2 d3) (on d3 d4) (on d4 d5) (on d5 C) (clear d1) (clear A) (clear B) 
+ (larger d2 d1) (larger d3 d1) (larger d4 d1) (larger d5 d1) (larger d3 d2) (larger d4 d2) (larger d5 d2) (larger d4 d3) (larger d5 d3) (larger d5 d4))
+
+(effects 
+ (on d1 d2) (on d2 d3) (on d3 d4) (on d4 d5) (on d5 A))
