@@ -4,7 +4,7 @@ application=app = Flask(__name__)
 import sqlite3 as sql
 import redis
 import time
-import _pickle as pickle
+import pickle
 
 
 
@@ -35,13 +35,27 @@ def addrec():
 
 @app.route('/list')
 def list():
-	start_t=time.time()
-	con = sql.connect("database.db") 
-	cur = con.cursor()
-	cur.execute("select * from Earthquake")
-	rows = cur.fetchall();
-	con.close()
-	end_t=time.time()-start_t
+	
+	cache="mycache"
+	query="select * from Earthquake"
+	if r.exists(cache):
+		print("with")
+		isCache = 'with Cache'
+		start_t = time.time()
+		rows = pickle.loads(r.get(cache))
+		end_t = time.time()-start_t
+		
+	else:
+		print("without")
+		start_t=time.time()
+		con = sql.connect("database.db") 
+		cur = con.cursor()
+		cur.execute(query)
+		rows = cur.fetchall();
+		con.close()
+		r.set(cache,pickle.dumps(rows))
+		end_t=time.time()-start_t
+		
 	return render_template("list.html",rows = rows,e=end_t)
 	
 if __name__ == '__main__':
