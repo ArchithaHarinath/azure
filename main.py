@@ -1,4 +1,4 @@
-from flask import Flask , render_template , request
+from flask import *
 app = Flask(__name__)
 import sqlite3 as sql
 import pandas as pd
@@ -16,6 +16,7 @@ import pandas as pd
 @app.route('/')
 def home():
 	return render_template('home.html')
+<<<<<<< HEAD
 
 @app.route('/enternew')
 def upload_csv():
@@ -42,3 +43,8 @@ def list():
 	 
 if __name__ == '__main__':
 	app.run()
+=======
+	
+if __name__ == '__main__':
+  app.run()
+>>>>>>> 4b655eb805ca8a81c6d4c205e3fe8a81b81c90b7
