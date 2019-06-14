@@ -39,14 +39,16 @@ def list():
 	cache="mycache"
 	query="select * from Earthquake"
 	if r.exists(cache):
-		print("with")
+		t="with"
+		print(t)
 		isCache = 'with Cache'
 		start_t = time.time()
 		rows = pickle.loads(r.get(cache))
 		end_t = time.time()-start_t
 		
 	else:
-		print("without")
+		t="without"
+		print(t)
 		start_t=time.time()
 		con = sql.connect("database.db") 
 		cur = con.cursor()
@@ -56,7 +58,7 @@ def list():
 		r.set(cache,pickle.dumps(rows))
 		end_t=time.time()-start_t
 		
-	return render_template("list.html",rows = rows,e=end_t)
+	return render_template("list.html",rows = rows,e=end_t, t=t)
 	
 if __name__ == '__main__':
 	app.run()
