@@ -1,6 +1,7 @@
 from flask import *
-app = Flask(__name__)
 import pandas
+application=app = Flask(__name__)
+
 
 
 
