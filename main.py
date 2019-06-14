@@ -4,7 +4,7 @@ application=app = Flask(__name__)
 import sqlite3 as sql
 import redis
 import time
-import _pickle as pickle
+
 
 myHostname = "architha.redis.cache.windows.net"
 myPassword = "0D0U2S4PfqMI7vkbaQ82TUNJB2jSYW2xpWawpgFPrHk="
