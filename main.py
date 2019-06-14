@@ -37,19 +37,20 @@ def addrec():
 def list():
 	
 	cache="mycache"
+	start_t = time.time()
 	query="select * from Earthquake"
 	if r.exists(cache):
 		t="with"
 		print(t)
 		isCache = 'with Cache'
-		start_t = time.time()
+		
 		rows = pickle.loads(r.get(cache))
 		end_t = time.time()-start_t
+		r.delete(cache)
 		
 	else:
 		t="without"
 		print(t)
-		start_t=time.time()
 		con = sql.connect("database.db") 
 		cur = con.cursor()
 		cur.execute(query)
