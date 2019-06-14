@@ -5,7 +5,7 @@ import sqlite3 as sql
 import redis
 import time
 import pickle
-
+import random
 
 
 myHostname = "architha.redis.cache.windows.net"
@@ -60,6 +60,37 @@ def list():
 		end_t=time.time()-start_t
 		
 	return render_template("list.html",rows = rows,e=end_t, t=t)
+
+@app.route('/c_i')
+def c_i():
+	return render_template('c_i.html')
 	
+@app.route('/mag_list' , methods=['GET', 'POST'])
+def mag_list():
+	
+	cache="mycache"
+	start_t = time.time()
+	for i in range(100):
+		if r.exists(cache+str(i)):
+			t="with"
+			isCache = 'with Cache'
+			rows = pickle.loads(r.get(cache+str(i)))
+			
+		else:	
+		
+			ran_num=random.uniform(2,5)
+			query = "select * from Earthquake where mag>" + str(ran_num)
+			t="without"
+			
+			con = sql.connect("database.db") 
+			cur = con.cursor()
+			cur.execute(query)
+			rows = cur.fetchall();
+			con.close()
+			r.set(cache+str(i),pickle.dumps(rows))
+	end_t=time.time()-start_t
+		
+	return render_template("mag_greater.html",data = rows ,e=end_t, t=t)	
+
 if __name__ == '__main__':
 	app.run()
