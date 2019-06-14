@@ -1,13 +1,12 @@
 from flask import *
 app = Flask(__name__)
-import sqlite3 as sql
 import pandas as pd
 
 
 
 @app.route('/')
 def home():
-	return "hello world"
-
+	return render_template('home.html')
+	
 if __name__ == '__main__':
 	app.run()
