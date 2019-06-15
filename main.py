@@ -70,16 +70,18 @@ def mag_list():
 	res=[]
 	cache="mycache"
 	start_t = time.time()
+	w_o=[]
 	for i in range(100):
-		ran_num=random.uniform(-2,8)
-		
+		ran_num="{:.2f}".format(random.uniform(-2,8))
+		print (ran_num)
 		if r.exists(cache+str(ran_num)):
 			t="with"
 			rows = pickle.loads(r.get(cache+str(ran_num)))
+			w_o.append(t)
 		else:	
-			
 			query = "select * from Earthquake where mag>" + str(ran_num)
 			t="without"
+			w_o.append(t)
 			con = sql.connect("database.db") 
 			cur = con.cursor()
 			cur.execute(query)
@@ -88,10 +90,9 @@ def mag_list():
 				res.append(rows)
 			r.set(cache+str(ran_num),pickle.dumps(rows))
 			con.close()
-			
-	end_t=time.time()-start_t
-	#print (res)	
-	return render_template("mag_greater.html",data = res ,e=end_t, t=t)	
+	print(w_o)		
+	end_t=time.time()-start_t	
+	return render_template("mag_greater.html",data = w_o ,e=end_t)	
 
 if __name__ == '__main__':
 	app.run()
