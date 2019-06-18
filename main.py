@@ -13,6 +13,8 @@ from sklearn.cluster import KMeans
 from scipy.spatial import distance
 from io import BytesIO
 import base64
+from math import * 
+from math import radians
 
 myHostname = "architha.redis.cache.windows.net"
 myPassword = "0D0U2S4PfqMI7vkbaQ82TUNJB2jSYW2xpWawpgFPrHk="
@@ -75,16 +77,22 @@ def c_i():
 def mag_list():
 	res=[]
 	cache="mycache"
-	start_t = time.time()
+	cache_t=0
+	uncache_t=0
 	w_o=[]
 	for i in range(100):
 		ran_num="{:.2f}".format(random.uniform(-2,8))
-		print (ran_num)
+		#print (ran_num)
 		if r.exists(cache+str(ran_num)):
 			t="with"
+			start_t = time.time()
 			rows = pickle.loads(r.get(cache+str(ran_num)))
+			end_t=time.time()-start_t
+			cache_t+=end_t
+			
 			w_o.append(t)
 		else:	
+			start_t = time.time()
 			query = "select * from Earthquake where mag>" + str(ran_num)
 			t="without"
 			w_o.append(t)
@@ -92,13 +100,15 @@ def mag_list():
 			cur = con.cursor()
 			cur.execute(query)
 			rows = cur.fetchall()
+			end_t=time.time()-start_t
+			uncache_t+=end_t
 			if rows!= None:
 				res.append(rows)
 			r.set(cache+str(ran_num),pickle.dumps(rows))
 			con.close()
-	print(w_o)		
-	end_t=time.time()-start_t	
-	return render_template("mag_greater.html",data = w_o ,e=end_t)	
+	#print(w_o)		
+		
+	return render_template("mag_greater.html",data = w_o ,un=uncache_t,c=cache_t)	
 	
 @app.route('/delete_i')
 def delete_i():
@@ -132,7 +142,6 @@ def names_in():
 def names_out():
 	
 	cache="mycache"
-
 	query="select distinct net from Earthquake where net like 'n%' "
 	con = sql.connect("database.db") 
 	cur = con.cursor()
@@ -169,15 +178,57 @@ def names_out():
 	#r.set(cache,pickle.dumps(rows))
 	end_t=time.time()-start_t
 		
-	return render_template("n_o.html",e=end_t)	
+	return render_template("n_o.html",e=end_t)
+	
+@app.route('/lat_i')
+def lat_i():
+	return render_template('lat_input.html')		
+	
+	
+@app.route('/select_lat',methods=['GET', 'POST'])
+def select_lat():
+
+	rows = []
+	magnitudes=[]
+	if request.method=='POST':
+
+		query = " SELECT * FROM  Earthquake "
+		con = sql.connect("database.db") 
+		cur = con.cursor()
+		cur.execute(query)
+		rows =cur.fetchall();
+		con.close()
+		radius = 6373.0
+		res=[]
+		start_t = time.time()
+		
+		cache="mycache"
+		
+		if r.exists(cache+str(rows[ran_num])):
+			t="with"
+			temp_res = pickle.loads(r.get(cache+str(rows[ran_num])))
+		
+		for row in rows:
+			lat1 = radians(float(row[2]))
+			lon1 = radians(float(row[3]))
+			dist_lat = lat1-radians(float(request.form['val1']))
+			dist_lon = lon1 -radians(float(request.form['val2']))
+			formula =abs( sin(dist_lat / 2)*2 + cos(radians(float(request.form['val1']))) * cos(lat1) * sin(dist_lon / 2)*2)
+			ans = 2*atan2(sqrt(formula), 1-sqrt(formula))
+			distance = float(radius*ans)
+			
+			val1=request.form['val3']
+			if distance <= (float(val1)):
+				res.append(row[5])
+		end_t=time.time()
+	return render_template("lat_out.html", end=end_t-start_t)
+
 
 def convert_fig_to_html(fig):
 	
 	figfile = BytesIO()
 	plt.savefig(figfile, format='png')
-	figfile.seek(0)  # rewind to beginning of file
-	
-	#figdata_png = base64.b64encode(figfile.read())
+	figfile.seek(0) 
 	figdata_png = base64.b64encode(figfile.getvalue())
 	return figdata_png
 
@@ -185,26 +236,27 @@ def convert_fig_to_html(fig):
 def clustering():	
 
 	query = "SELECT latitude,longitude FROM Earthquake "
+	#query = "SELECT mag FROM Earthquake "
 	con = sql.connect("database.db") 
 	cur = con.cursor()
 	cur.execute(query)
 	rows = cur.fetchall()
 	y=pd.DataFrame(rows)
+	X= y.dropna()
+	k=KMeans(n_clusters=5,random_state=0).fit(X)
 	
-	k=KMeans(n_clusters=5,random_state=0).fit(y)
 	c=k.cluster_centers_
 	l=k.labels_
-	X= y.dropna()
-	#print(X[0])	
+		
 	fig=plt.figure()
 	plt.scatter(X[0],X[1],c=l)
-	plt.scatter(c[:, 0], c[:, 1], c='red', s=200, marker='+')
+	print(c[:,0])
+	plt.scatter(c[:, 0], c[:, 1], c='y', s=100, marker='x')
+	plt.title('Clusters based on latitude and longitude')
+	plt.xlabel('latitude')
+	plt.ylabel('longitude')
 	plot=convert_fig_to_html(fig)
-	#print(X[:,0])
-	#plt.show()
-	#fig.savefig('static/img.png')
-	#print(k.cluster_centers_)
-
+	
 	return render_template("clus_o.html",data=plot.decode('utf8'))
 
 if __name__ == '__main__':
