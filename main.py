@@ -79,17 +79,21 @@ def mag_list():
 	cache="mycache"
 	cache_t=0
 	uncache_t=0
+	cc=0
+	uc=0
 	w_o=[]
-	for i in range(100):
+	st=time.time()
+	for i in range(500):
 		ran_num="{:.2f}".format(random.uniform(-2,8))
 		#print (ran_num)
-		if r.exists(cache+str(ran_num)):
+		if r.exists(cache+str(i)):
 			t="with"
 			start_t = time.time()
-			rows = pickle.loads(r.get(cache+str(ran_num)))
+			#rows = pickle.loads(r.get(cache+str(ran_num)))
+			rows=r.get(cache+str(i))
 			end_t=time.time()-start_t
 			cache_t+=end_t
-			
+			cc+=1
 			w_o.append(t)
 		else:	
 			start_t = time.time()
@@ -104,11 +108,13 @@ def mag_list():
 			uncache_t+=end_t
 			if rows!= None:
 				res.append(rows)
-			r.set(cache+str(ran_num),pickle.dumps(rows))
+			#r.set(cache+str(ran_num),pickle.dumps(rows))
+			r.set(cache+str(i),1)
+			uc+=1
 			con.close()
 	#print(w_o)		
-		
-	return render_template("mag_greater.html",data = w_o ,un=uncache_t,c=cache_t)	
+	et=time.time()-st	
+	return render_template("mag_greater.html",un=uncache_t,c=cache_t,e=et)	
 	
 @app.route('/delete_i')
 def delete_i():
