@@ -88,6 +88,7 @@ def mag_list():
 		mag_v1 = int(request.form["val1"])
 		mag_v2 = int(request.form["val2"])
 		temp=[]
+		time1=[]
 		cache="mycache"
 		for i in range(int(request.form["val3"])):
 			res=[]
@@ -105,7 +106,9 @@ def mag_list():
 			temp.append(res)
 			r.set(cache+str(i),1)
 		#print (rows)
-		et=time.time()-st
+			et=time.time()-st
+			time1.append(et)
+			
 		'''
 		res=[]
 		cache="mycache"
@@ -145,7 +148,7 @@ def mag_list():
 		#print(w_o)		
 		et=time.time()-st	
 		'''
-	return render_template("mag_greater.html", data=temp , time=et)	
+	return render_template("mag_greater.html", data=temp , time1=time1)	
 	#return render_template("mag_greater.html",un=uncache_t,c=cache_t,e=et)	
 	
 @app.route('/delete_i')
