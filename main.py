@@ -87,14 +87,25 @@ def mag_list():
 	if request.method=='POST':
 		mag_v1 = int(request.form["val1"])
 		mag_v2 = int(request.form["val2"])
-		
-		query = "select place,time,mag from Earthquake where latitude >= ' " + str(mag_v1)+ " 'and latitude <=' " + str(mag_v2)+ " ' " 
-		con = sql.connect("database.db") 
-		cur = con.cursor()
-		cur.execute(query)
-		rows = cur.fetchall()
+		temp=[]
+		cache="mycache"
+		for i in range(int(request.form["val3"])):
+			res=[]
+			ran_num="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+			ran_num2="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+			st=time.time()
+			query = "select count(*) from Earthquake where latitude >= ' " + str(ran_num)+ " 'and latitude <=' " + str(ran_num2)+ " ' " 
+			con = sql.connect("database.db") 
+			cur = con.cursor()
+			cur.execute(query)
+			rows = cur.fetchall()
+			res.append(rows)
+			res.append(ran_num)
+			res.append(ran_num2)
+			temp.append(res)
+			r.set(cache+str(i),1)
 		#print (rows)
-		
+		et=time.time()-st
 		'''
 		res=[]
 		cache="mycache"
@@ -134,7 +145,7 @@ def mag_list():
 		#print(w_o)		
 		et=time.time()-st	
 		'''
-	return render_template("mag_greater.html", data=rows)	
+	return render_template("mag_greater.html", data=temp , time=et)	
 	#return render_template("mag_greater.html",un=uncache_t,c=cache_t,e=et)	
 	
 @app.route('/delete_i')
