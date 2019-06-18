@@ -96,9 +96,11 @@ def mag_list():
 			if r.exists(cache+str(i)):
 				start_t = time.time()
 				rows = pickle.loads(r.get(cache+str(i)))
+				
+				
+				temp.append(rows)
 				end_t=time.time()-start_t
 				time2.append(end_t)
-				temp.append(rows)
 				
 			else:
 				res=[]
