@@ -89,26 +89,37 @@ def mag_list():
 		mag_v2 = int(request.form["val2"])
 		temp=[]
 		time1=[]
+		time2=[]
 		cache="mycache"
+		full_start=time.time()
 		for i in range(int(request.form["val3"])):
-			res=[]
-			ran_num="{:.3f}".format(random.uniform(mag_v1,mag_v2))
-			ran_num2="{:.3f}".format(random.uniform(mag_v1,mag_v2))
-			st=time.time()
-			query = "select count(*) from Earthquake where latitude >= ' " + str(ran_num)+ " 'and latitude <=' " + str(ran_num2)+ " ' " 
-			con = sql.connect("database.db") 
-			cur = con.cursor()
-			cur.execute(query)
-			rows = cur.fetchall()
-			res.append(rows)
-			res.append(ran_num)
-			res.append(ran_num2)
-			temp.append(res)
-			r.set(cache+str(i),1)
-		#print (rows)
-			et=time.time()-st
-			time1.append(et)
-			
+			if r.exists(cache+str(i)):
+				start_t = time.time()
+				rows = pickle.loads(r.get(cache+str(i)))
+				end_t=time.time()-start_t
+				time2.append(end_t)
+				temp.append(rows)
+				
+			else:
+				res=[]
+				ran_num="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+				ran_num2="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+				st=time.time()
+				query = "select count(*) from Earthquake where latitude >= ' " + str(ran_num)+ " 'and latitude <=' " + str(ran_num2)+ " ' " 
+				con = sql.connect("database.db") 
+				cur = con.cursor()
+				cur.execute(query)
+				rows = cur.fetchall()
+				res.append(rows)
+				res.append(ran_num)
+				res.append(ran_num2)
+				temp.append(res)
+				r.set(cache+str(i),pickle.dumps(res))
+				et=time.time()-st
+				time1.append(et)
+		
+		end_time=time.time()-full_start
+		
 		'''
 		res=[]
 		cache="mycache"
@@ -148,7 +159,7 @@ def mag_list():
 		#print(w_o)		
 		et=time.time()-st	
 		'''
-	return render_template("mag_greater.html", data=temp , time1=time1)	
+	return render_template("mag_greater.html", data=temp , time2 =time2)	
 	#return render_template("mag_greater.html",un=uncache_t,c=cache_t,e=et)	
 	
 @app.route('/delete_i')

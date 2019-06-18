@@ -89,6 +89,33 @@ def mag_list():
     Then you will show: 
     The number of matching tuples (results) EACH time through AND random values generated as well 
     as the time taken to do EACH "random" query.
+	@app.route('/mag_list' , methods=['GET', 'POST'])
+def mag_list():
+	
+	if request.method=='POST':
+		mag_v1 = int(request.form["val1"])
+		mag_v2 = int(request.form["val2"])
+		temp=[]
+		time1=[]
+		cache="mycache"
+		for i in range(int(request.form["val3"])):
+			res=[]
+			ran_num="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+			ran_num2="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+			st=time.time()
+			query = "select count(*) from Earthquake where latitude >= ' " + str(ran_num)+ " 'and latitude <=' " + str(ran_num2)+ " ' " 
+			con = sql.connect("database.db") 
+			cur = con.cursor()
+			cur.execute(query)
+			rows = cur.fetchall()
+			res.append(rows)
+			res.append(ran_num)
+			res.append(ran_num2)
+			temp.append(res)
+			r.set(cache+str(i),1)
+		#print (rows)
+			et=time.time()-st
+			time1.append(et)
 
  7. Repeat part 6 using an in-memory caching mechanism (NOT an in-memory database) repeat the previous step, then show us.
 
