@@ -87,14 +87,14 @@ def mag_list():
 		ran_num="{:.2f}".format(random.uniform(-2,8))
 		#print (ran_num)
 		if r.exists(cache+str(i)):
-			t="with"
+			#t="with"
 			start_t = time.time()
 			#rows = pickle.loads(r.get(cache+str(ran_num)))
 			rows=r.get(cache+str(i))
 			end_t=time.time()-start_t
 			cache_t+=end_t
 			cc+=1
-			w_o.append(t)
+			#w_o.append(t)
 		else:	
 			start_t = time.time()
 			query = "select * from Earthquake where mag>" + str(ran_num)
@@ -103,11 +103,9 @@ def mag_list():
 			con = sql.connect("database.db") 
 			cur = con.cursor()
 			cur.execute(query)
-			rows = cur.fetchall()
+			#rows = cur.fetchall()
 			end_t=time.time()-start_t
 			uncache_t+=end_t
-			if rows!= None:
-				res.append(rows)
 			#r.set(cache+str(ran_num),pickle.dumps(rows))
 			r.set(cache+str(i),1)
 			uc+=1
