@@ -83,7 +83,7 @@ def mag_list():
 	uc=0
 	w_o=[]
 	st=time.time()
-	for i in range(500):
+	for i in range(300):
 		ran_num="{:.2f}".format(random.uniform(-2,8))
 		#print (ran_num)
 		if r.exists(cache+str(i)):
