@@ -118,10 +118,88 @@ def mag_list():
 			time1.append(et)
 
  7. Repeat part 6 using an in-memory caching mechanism (NOT an in-memory database) repeat the previous step, then show us.
+@app.route('/mag_list' , methods=['GET', 'POST'])
+def mag_list():
+	
+	if request.method=='POST':
+		mag_v1 = int(request.form["val1"])
+		mag_v2 = int(request.form["val2"])
+		temp=[]
+		time1=[]
+		time2=[]
+		cache="mycache"
+		for i in range(int(request.form["val3"])):
+			if r.exists(cache+str(i)):
+				start_t = time.time()
+				rows = pickle.loads(r.get(cache+str(i)))
+				temp.append(rows)
+				end_t=time.time()-start_t
+				time2.append(end_t)
+				
+			else:
+				res=[]
+				ran_num="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+				ran_num2="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+				
+				query = "select count(*) from Earthquake where latitude >= ' " + str(ran_num)+ " 'and latitude <=' " + str(ran_num2)+ " ' " 
+				con = sql.connect("database.db") 
+				cur = con.cursor()
+				cur.execute(query)
+				rows = cur.fetchall()
+				res.append(rows)
+				res.append(ran_num)
+				res.append(ran_num2)
+				temp.append(res)
+				r.set(cache+str(i),pickle.dumps(res))
+				
+				time1.append(et)
+		
+		return render_template("mag_greater.html", data=temp , time2 =time2)
+
+
 
  8. Repeat part 6, allow a user to either use an in-memory caching mechanism or none, and for ALL queries 
     show ONLY cumulative time to do ALL queries.
-
+	
+	@app.route('/mag_list' , methods=['GET', 'POST'])
+def mag_list():
+	
+	if request.method=='POST':
+		mag_v1 = int(request.form["val1"])
+		mag_v2 = int(request.form["val2"])
+		temp=[]
+		time1=[]
+		time2=[]
+		cache="mycache"
+		full_start=time.time()
+		for i in range(int(request.form["val3"])):
+			if r.exists(cache+str(i)):
+				start_t = time.time()
+				rows = pickle.loads(r.get(cache+str(i)))
+				temp.append(rows)
+				end_t=time.time()-start_t
+				time2.append(end_t)
+				
+			else:
+				res=[]
+				ran_num="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+				ran_num2="{:.3f}".format(random.uniform(mag_v1,mag_v2))
+				st=time.time()
+				query = "select count(*) from Earthquake where latitude >= ' " + str(ran_num)+ " 'and latitude <=' " + str(ran_num2)+ " ' " 
+				con = sql.connect("database.db") 
+				cur = con.cursor()
+				cur.execute(query)
+				rows = cur.fetchall()
+				res.append(rows)
+				res.append(ran_num)
+				res.append(ran_num2)
+				temp.append(res)
+				r.set(cache+str(i),pickle.dumps(res))
+				et=time.time()-st
+				time1.append(et)
+		
+		end_time=time.time()-full_start
+	return render_template("mag_greater.html", data=temp , time2 =end_time)	
  9. Show GTA parts 5, 6, 7, 8
 
  10. When complete, return (send) this quiz

@@ -96,8 +96,6 @@ def mag_list():
 			if r.exists(cache+str(i)):
 				start_t = time.time()
 				rows = pickle.loads(r.get(cache+str(i)))
-				
-				
 				temp.append(rows)
 				end_t=time.time()-start_t
 				time2.append(end_t)
@@ -161,7 +159,7 @@ def mag_list():
 		#print(w_o)		
 		et=time.time()-st	
 		'''
-	return render_template("mag_greater.html", data=temp , time2 =time2)	
+	return render_template("mag_greater.html", data=temp , time2 =end_time)	
 	#return render_template("mag_greater.html",un=uncache_t,c=cache_t,e=et)	
 	
 @app.route('/delete_i')
