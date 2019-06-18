@@ -37,7 +37,7 @@ def addrec():
 		con = sql.connect("database.db")
 		csv = request.files['myfile']
 		file = pd.read_csv(csv)
-		file.to_sql('Earthquake', con, schema=None, if_exists='replace', index=True, index_label=None, chunksize=None, dtype=None)	  
+		file.to_sql('Earth', con, schema=None, if_exists='replace', index=True, index_label=None, chunksize=None, dtype=None)	  
 		con.close()
 	return render_template("result.html",msg = "Record inserted successfully")
 
@@ -73,7 +73,7 @@ def list():
 		r.set(cache,pickle.dumps(rows))
 		end_t=time.time()-start_t
 	
-	#print(lis)
+	
 	return render_template("list.html",data = rows)
 	#return render_template("list.html",rows = rows,e=end_t, t=t),data = rows
 
@@ -87,6 +87,15 @@ def mag_list():
 	if request.method=='POST':
 		mag_v1 = int(request.form["val1"])
 		mag_v2 = int(request.form["val2"])
+		
+		query = "select place,time,mag from Earthquake where latitude >= ' " + str(mag_v1)+ " 'and latitude <=' " + str(mag_v2)+ " ' " 
+		con = sql.connect("database.db") 
+		cur = con.cursor()
+		cur.execute(query)
+		rows = cur.fetchall()
+		#print (rows)
+		
+		'''
 		res=[]
 		cache="mycache"
 		cache_t=0
@@ -124,7 +133,9 @@ def mag_list():
 				con.close()
 		#print(w_o)		
 		et=time.time()-st	
-	return render_template("mag_greater.html",un=uncache_t,c=cache_t,e=et)	
+		'''
+	return render_template("mag_greater.html", data=rows)	
+	#return render_template("mag_greater.html",un=uncache_t,c=cache_t,e=et)	
 	
 @app.route('/delete_i')
 def delete_i():
