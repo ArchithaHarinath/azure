@@ -375,7 +375,7 @@ def pie_chart():
 		
 		
 		fig = plt.figure()
-		plt.plot(x, y,marker ='o',color='r',markeredgecolor='b')
+		plt.plot(y,x ,marker ='o',color='r',markeredgecolor='b')
 		plt.title('x=(y*y)+1')
 		plt.xlabel('y value')
 		plt.ylabel('x value')
