@@ -361,6 +361,57 @@ def pie_i():
 def pie_chart():
 	
 	if request.method=='POST':	
+	
+		n = int(request.form["val1"])
+		n2= int(request.form["val2"])
+		x=[]
+		y=[]
+		i=n
+		for i in range (n2):
+
+			t=(i*i)+1
+			x.append(t)
+			y.append(i)
+		
+		
+		fig = plt.figure()
+		plt.plot(x, y,marker ='o',color='r',markeredgecolor='b')
+		plt.title('x=(y*y)+1')
+		plt.xlabel('y value')
+		plt.ylabel('x value')
+		plot = convert_fig_to_html(fig)
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 		#pie chart
 		'''
 		count=[]
