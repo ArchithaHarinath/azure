@@ -456,8 +456,9 @@ def pie_chart():
 			plt.bar(y_pos[i] , count[i] , color=color[i], align ='center',label="{0}".format(labels_n[i]))
 			
 		plt.xticks(y_pos,labels_n)
-		plt.xlabel('count')
-		plt.title('mag count')
+		plt.xlabel('range')
+		plt.title(' TotalPop')
+		plt.ylabel('count')
 		#plt.show()
 		for i,v in enumerate(count):
 			plt.text(i,v , str(v), color='r', fontweight='bold' , horizontalalignment='center') #vertical
