@@ -37,44 +37,36 @@ def addrec():
 		con = sql.connect("database.db")
 		csv = request.files['myfile']
 		file = pd.read_csv(csv)
-		file.to_sql('Earth', con, schema=None, if_exists='replace', index=True, index_label=None, chunksize=None, dtype=None)	  
+		file.to_sql('Vote', con, schema=None, if_exists='replace', index=True, index_label=None, chunksize=None, dtype=None)	  
 		con.close()
 	return render_template("result.html",msg = "Record inserted successfully")
 
 @app.route('/list')
 def list():
 	
-	cache="mycache"
-	start_t = time.time()
-	query="select * from Earthquake "
+	var1=500
+	var2=1000
+	var3=50000
+	query = "select StateName from Vote where TotalPop BETWEEN ' " + str(var1)+ " 'and ' " + str(var2)+ " ' " 
+	#query="select * from Vote"  and TotalPop <=' " +str(var2)+" '
+	con = sql.connect("database.db") 
+	cur = con.cursor()
+	cur.execute(query)
+	rows = str(cur.fetchall());
+	con.close()
+	
+	query = "select StateName from Vote where TotalPop BETWEEN ' " + str(var1)+ " 'and ' " + str(var2)+ " ' " 
+	#query="select * from Vote"  and TotalPop <=' " +str(var2)+" '
+	con = sql.connect("database.db") 
+	cur = con.cursor()
+	cur.execute(query)
+	rows1 = str(cur.fetchall());
+	con.close()
 	
 	
-	#query="select County from Countries where state=(select FULL from Statef where CODE='AK')"
+	#print(rows)
 	
-	if r.exists(cache):
-		t="with"
-		print(t)
-		isCache = 'with Cache'
-		
-		rows = pickle.loads(r.get(cache))
-		end_t = time.time()-start_t
-		r.delete(cache)
-		
-	else:
-		t="without"
-		print(t)
-	
-		con = sql.connect("database.db") 
-		cur = con.cursor()
-		cur.execute(query)
-		rows = str(cur.fetchall());
-		con.close()
-	
-		r.set(cache,pickle.dumps(rows))
-		end_t=time.time()-start_t
-	
-	
-	return render_template("list.html",data = rows)
+	return render_template("list.html",data = rows , data1=rows1)
 	#return render_template("list.html",rows = rows,e=end_t, t=t),data = rows
 
 @app.route('/magrange_i')
@@ -291,6 +283,13 @@ def convert_fig_to_html(fig):
 @app.route('/clustering')
 def clustering():	
 
+
+
+
+
+	
+
+	'''
 	query = "SELECT latitude,longitude FROM Earthquake "
 	#query = "SELECT mag FROM Earthquake "
 	con = sql.connect("database.db") 
@@ -313,14 +312,25 @@ def clustering():
 	# eucledian distance 
 	for i in  range(len(c)):
 		temp=[]
-		for j in range(i+1,len(c)):
+		for j in range(0,len(c)):
 			temp.append(distance.euclidean(c[i],c[j]))
-			m.append(temp)
-	
+		m.append(temp)
+		
+	print (m)
+	'''
+	'''
+	for i in  range(len(c)):
+		temp=[]
+		t = "c"+str(i)
+		m.append(t)
+		for j in range(0,len(c)):
+			if i!=j :
+				temp.append(distance.euclidean(c[i],c[j]))
+		m.append(temp)
 	
 	#print(n)
-	#print(m)
-	
+	print(m)
+	'''
 	#elbow method
 	'''
 	Ks = range(2, 10)
@@ -342,132 +352,136 @@ def clustering():
 	plt.ylabel('longitude')
 	plot=convert_fig_to_html(fig)
 	return render_template("clus_o.html",data=plot.decode('utf8'))
-	
 
-@app.route('/pie_chart')
+@app.route('/pie_i')
+def pie_i():
+	return render_template('pie_input.html')	
+
+@app.route('/pie_chart' ,methods=['GET', 'POST'])
 def pie_chart():
 	
-	#pie chart
-	'''
-	count=[]
-	labels=[]
-	
-	for i in np.arange(-2,10,2):
-		t=[]
-		val1=i
-		val2=i+2
-		query = "select count(*) from Earthquake where mag BETWEEN ' " + str(val1)+ " 'and ' " + str(val2)+ " ' " 
+	if request.method=='POST':	
+		#pie chart
+		'''
+		count=[]
+		labels=[]
+		
+		for i in np.arange(-2,10,2):
+			t=[]
+			val1=i
+			val2=i+2
+			query = "select count(*) from Earthquake where mag BETWEEN ' " + str(val1)+ " 'and ' " + str(val2)+ " ' " 
+			con = sql.connect("database.db") 
+			cur = con.cursor()
+			cur.execute(query)
+			rows = cur.fetchone()
+			count.append(rows[0])
+			t.append(val1)
+			t.append(val2)
+			labels.append(t)
+			#print(t)
+		#explode=(0.1,0,0.1,0,0.1,0)
+		fig=plt.figure()
+		colors=['y','g','r','b','c','b']
+		explode = (0.1, 0, 0, 0,0,0)
+		texts=plt.pie(count, colors=colors, explode=explode, labels=labels , autopct='%1.1f%%', shadow=True)
+		plt.legend()
+		#plt.show()
+		plot=convert_fig_to_html(fig)
+		'''
+		#Histogram
+		'''
+		query="select mag from Earthquake"
 		con = sql.connect("database.db") 
 		cur = con.cursor()
 		cur.execute(query)
-		rows = cur.fetchone()
-		count.append(rows[0])
-		t.append(val1)
-		t.append(val2)
-		labels.append(t)
-		#print(t)
-	#explode=(0.1,0,0.1,0,0.1,0)
-	fig=plt.figure()
-	colors=['y','g','r','b','c','b']
-	explode = (0.1, 0, 0, 0,0,0)
-	texts=plt.pie(count, colors=colors, explode=explode, labels=labels , autopct='%1.1f%%', shadow=True)
-	plt.legend()
-	#plt.show()
-	plot=convert_fig_to_html(fig)
-	'''
-	#Histogram
-	'''
-	query="select mag from Earthquake"
-	con = sql.connect("database.db") 
-	cur = con.cursor()
-	cur.execute(query)
-	rows = cur.fetchall()
-	y=pd.DataFrame(rows)
-	x=y.dropna()
-	num_bins=5
-	fig=plt.figure()
-	n,bins,patches=plt.hist(x[0] , bins=num_bins ,facecolor='blue' , alpha=0.5)
-	#plt.show()
-	plot=convert_fig_to_html(fig)
-	'''
-	#bar chart vertical
-	'''
-	count=[]
-	labels_n=[]
-	
-	for i in np.arange(-2,10,2):
-		t=[]
-		val1=i
-		val2=i+2
-		query = "select count(*) from Earthquake where mag BETWEEN ' " + str(val1)+ " 'and ' " + str(val2)+ " ' " 
-		con = sql.connect("database.db") 
-		cur = con.cursor()
-		cur.execute(query)
-		rows = cur.fetchone()
-		count.append(rows[0])
-		t.append(str(val1)+"-"+str(val2))
-		#t.append(str(val2))
-		labels_n.append(t)
+		rows = cur.fetchall()
+		y=pd.DataFrame(rows)
+		x=y.dropna()
+		num_bins=5
+		fig=plt.figure()
+		n,bins,patches=plt.hist(x[0] , bins=num_bins ,facecolor='blue' , alpha=0.5)
+		#plt.show()
+		plot=convert_fig_to_html(fig)
+		'''
+		#bar chart vertical
+		'''
+		count=[]
+		labels_n=[]
+		n = int(request.form["val1"])
+		for i in np.arange(100,3000,n):
+			t=[]
+			val1=i
+			val2=i+n
+			query = "select count(*) from Vote where  TotalPop BETWEEN ' " + str(val1)+ " 'and ' " + str(val2)+ " ' " 
+			con = sql.connect("database.db") 
+			cur = con.cursor()
+			cur.execute(query)
+			rows = cur.fetchone()
+			count.append(rows[0])
+			t.append(str(val1)+"-"+str(val2))
+			#t.append(str(val2))
+			labels_n.append(t)
+			
+		print(labels_n)
+		fig=plt.figure()
+		y_pos =np.arange(len(labels_n))
+		#print()
+		color=['r','b','g','y','c','b']
+		for i  in range(len(count)):
+			plt.bar(y_pos[i] , count[i] , color=color[i], align ='center',label="{0}".format(labels_n[i]))
+			
+		plt.xticks(y_pos,labels_n)
+		plt.xlabel('count')
+		plt.title('mag count')
+		#plt.show()
+		for i,v in enumerate(count):
+			plt.text(i,v , str(v), color='r', fontweight='bold' , horizontalalignment='center') #vertical
+			# plt.text(v,i , str(v), color='r', fontweight='bold') horizontal
+			#print(v,i,str(v))
+		#legend = ['og_Male','og_Female','n_Male','n_Female']
+		plt.legend(numpoints=1)
+		plot=convert_fig_to_html(fig)
+		'''
+		#barchart horizontal
+		'''
+		count=[]
+		labels_n=[]
 		
-	#print(labels_n)
-	fig=plt.figure()
-	y_pos =np.arange(len(labels_n))
-	#print()
-	color=['r','b','g','y','c','b']
-	for i  in range(len(count)):
-		plt.bar(y_pos[i] , count[i] , color=color[i], align ='center',label="{0}".format(labels_n[i]))
-		
-	plt.xticks(y_pos,labels_n)
-	plt.xlabel('count')
-	plt.title('mag count')
-	#plt.show()
-	for i,v in enumerate(count):
-		plt.text(i,v , str(v), color='r', fontweight='bold' , horizontalalignment='center') #vertical
-		# plt.text(v,i , str(v), color='r', fontweight='bold') horizontal
-		#print(v,i,str(v))
-	#legend = ['og_Male','og_Female','n_Male','n_Female']
-	plt.legend(numpoints=1)
-	plot=convert_fig_to_html(fig)
-	'''
-	#barchart horizontal
-	
-	count=[]
-	labels_n=[]
-	
-	for i in np.arange(-2,10,2):
-		t=[]
-		val1=i
-		val2=i+2
-		query = "select count(*) from Earthquake where mag BETWEEN ' " + str(val1)+ " 'and ' " + str(val2)+ " ' " 
-		con = sql.connect("database.db") 
-		cur = con.cursor()
-		cur.execute(query)
-		rows = cur.fetchone()
-		count.append(rows[0])
-		t.append(str(val1)+"-"+str(val2))
-		#t.append(str(val2))
-		labels_n.append(t)
-		
-	#print(labels_n)
-	fig=plt.figure()
-	y_pos =np.arange(len(labels_n))
-	#print()
-	color=['r','b','g','y','c','b']
-	for i  in range(len(count)):
-		plt.barh(y_pos[i] , count[i] , color=color[i], align ='center',label="{0}".format(labels_n[i]))
-		
-	plt.yticks(y_pos,labels_n)
-	plt.xlabel('count')
-	plt.title('mag count')
-	#plt.show()
-	for i,v in enumerate(count):
-		#plt.text(i,v , str(v), color='r', fontweight='bold' , horizontalalignment='center') #vertical
-		plt.text(v,i , str(v), color='r', fontweight='bold')
-		#print(v,i,str(v))
-	#legend = ['og_Male','og_Female','n_Male','n_Female']
-	plt.legend(numpoints=1)
-	plot=convert_fig_to_html(fig)
-	
+		for i in np.arange(-2,10,2):
+			t=[]
+			val1=i
+			val2=i+2
+			query = "select count(*) from Earthquake where mag BETWEEN ' " + str(val1)+ " 'and ' " + str(val2)+ " ' " 
+			con = sql.connect("database.db") 
+			cur = con.cursor()
+			cur.execute(query)
+			rows = cur.fetchone()
+			count.append(rows[0])
+			t.append(str(val1)+"-"+str(val2))
+			#t.append(str(val2))
+			labels_n.append(t)
+			
+		#print(labels_n)
+		fig=plt.figure()
+		y_pos =np.arange(len(labels_n))
+		#print()
+		color=['r','b','g','y','c','b']
+		for i  in range(len(count)):
+			plt.barh(y_pos[i] , count[i] , color=color[i], align ='center',label="{0}".format(labels_n[i]))
+			
+		plt.yticks(y_pos,labels_n)
+		plt.xlabel('count')
+		plt.title('mag count')
+		#plt.show()
+		for i,v in enumerate(count):
+			#plt.text(i,v , str(v), color='r', fontweight='bold' , horizontalalignment='center') #vertical
+			plt.text(v,i , str(v), color='r', fontweight='bold')
+			#print(v,i,str(v))
+		#legend = ['og_Male','og_Female','n_Male','n_Female']
+		plt.legend(numpoints=1)
+		plot=convert_fig_to_html(fig)
+		'''
 	return render_template("pie.html",data=plot.decode('utf8'))
 	
 @app.route('/linegraph')
