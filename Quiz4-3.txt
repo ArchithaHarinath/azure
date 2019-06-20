@@ -60,7 +60,36 @@ Show and submit code, when each part is complete, raise your hand and then show 
     last name then comma then first name (as it appears on your student ID), in large font at the top of every web page displayed 
     (for this quiz)
     On the same web page show the names of all states with a total population between 5 to 10 million and 
-    then between 10 million and 50 million. 3,717,000 1,000,000
+    then between 10 million and 50 million.
+
+
+
+	@app.route('/list')
+def list():
+	
+	var1=500
+	var2=1000
+	var3=50000
+	query = "select StateName from Vote where TotalPop BETWEEN ' " + str(var1)+ " 'and ' " + str(var2)+ " ' " 
+	#query="select * from Vote"  and TotalPop <=' " +str(var2)+" '
+	con = sql.connect("database.db") 
+	cur = con.cursor()
+	cur.execute(query)
+	rows = str(cur.fetchall());
+	con.close()
+	
+	query = "select StateName from Vote where TotalPop BETWEEN ' " + str(var1)+ " 'and ' " + str(var2)+ " ' " 
+	#query="select * from Vote"  and TotalPop <=' " +str(var2)+" '
+	con = sql.connect("database.db") 
+	cur = con.cursor()
+	cur.execute(query)
+	rows1 = str(cur.fetchall());
+	con.close()
+	
+	
+	#print(rows)
+	
+	return render_template("list.html",data = rows , data1=rows1)
 
  6. Show a pie chart for percent voted, that is, total population/voted (2nd column divided by last column)
     from  to 40 to 80 percent in groups of N percent, where we will give you N in a web form, 
@@ -75,10 +104,47 @@ Show and submit code, when each part is complete, raise your hand and then show 
     (For example, N1 might be 1, and N2 is 4, so the values for y, will be 1, 2, 3, and 4, the corresponding x are 2, 5, 10, 17)
     The axis should be labeled, and the plot should occupy between 70% and 95% of the width of your display.
 
+	@app.route('/pie_chart' ,methods=['GET', 'POST'])
+def pie_chart():
+	
+	if request.method=='POST':	
+	
+		n = int(request.form["val1"])
+		n2= int(request.form["val2"])
+		x=[]
+		y=[]
+		i=n
+		for i in range (n2):
+
+			t=(i*i)+1
+			x.append(t)
+			y.append(i)
+		
+		
+		fig = plt.figure()
+		plt.plot(y,x ,marker ='o',color='r',markeredgecolor='b')
+		plt.title('x=(y*y)+1')
+		plt.xlabel('y value')
+		plt.ylabel('x value')
+		plot = convert_fig_to_html(fig)
+		
+
+	figfile = BytesIO()
+	plt.savefig(figfile, format='png')
+	figfile.seek(0) 
+	figdata_png = base64.b64encode(figfile.getvalue())
+	return figdata_png
+
+
+
  8. Create a vertical bar graph that shows the total registered for all states (ie, the number of states) for in groups of N
     (millions), (for example if N is 10, then 1 to 10 million, 10 to 20 million, 20 to 30 million, etc)
     The bars should be labeled, and the chart should occupy between 70% and 95% of the width of your display,
     show legend (amounts) inside each bar.
+
+
+
+
  
  9. Show GTA parts 5, 6, 7, 8
 

@@ -362,6 +362,7 @@ def pie_chart():
 	
 	if request.method=='POST':	
 	
+		'''
 		n = int(request.form["val1"])
 		n2= int(request.form["val2"])
 		x=[]
@@ -381,38 +382,9 @@ def pie_chart():
 		plt.ylabel('x value')
 		plot = convert_fig_to_html(fig)
 		
+		'''
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		#pie chart
+			#pie chart
 		'''
 		count=[]
 		labels=[]
@@ -456,11 +428,12 @@ def pie_chart():
 		plot=convert_fig_to_html(fig)
 		'''
 		#bar chart vertical
-		'''
+		
 		count=[]
 		labels_n=[]
 		n = int(request.form["val1"])
-		for i in np.arange(100,3000,n):
+		
+		for i in np.arange(1000,30000,n):
 			t=[]
 			val1=i
 			val2=i+n
@@ -474,10 +447,10 @@ def pie_chart():
 			#t.append(str(val2))
 			labels_n.append(t)
 			
-		print(labels_n)
+		
 		fig=plt.figure()
 		y_pos =np.arange(len(labels_n))
-		#print()
+		#print(y_pos)
 		color=['r','b','g','y','c','b']
 		for i  in range(len(count)):
 			plt.bar(y_pos[i] , count[i] , color=color[i], align ='center',label="{0}".format(labels_n[i]))
@@ -490,10 +463,10 @@ def pie_chart():
 			plt.text(i,v , str(v), color='r', fontweight='bold' , horizontalalignment='center') #vertical
 			# plt.text(v,i , str(v), color='r', fontweight='bold') horizontal
 			#print(v,i,str(v))
-		#legend = ['og_Male','og_Female','n_Male','n_Female']
+		
 		plt.legend(numpoints=1)
 		plot=convert_fig_to_html(fig)
-		'''
+		
 		#barchart horizontal
 		'''
 		count=[]
