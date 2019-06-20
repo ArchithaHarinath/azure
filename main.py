@@ -303,16 +303,44 @@ def clustering():
 	
 	c=k.cluster_centers_
 	l=k.labels_
+	n=[]
+	m=[]
+	label=pd.DataFrame(l)
+	#get count of number of points in each cluster 
+	for i in range(5):
+		n.append(len(label.index[label[0]==i].tolist()))
 		
+	# eucledian distance 
+	for i in  range(len(c)):
+		temp=[]
+		for j in range(i+1,len(c)):
+			temp.append(distance.euclidean(c[i],c[j]))
+			m.append(temp)
+	
+	
+	#print(n)
+	#print(m)
+	
+	#elbow method
+	'''
+	Ks = range(2, 10)
+	km = [KMeans(n_clusters=i) for i in Ks]
+	score = [km[i].fit(X).score(X)**2 for i in range(len(km))]
+	y = plt.plot(Ks,score)
+	'''
+
+	plt.show()
+	
+	
+
 	fig=plt.figure()
 	plt.scatter(X[0],X[1],c=l)
-	print(c[:,0])
+	#print(c[:,0])
 	plt.scatter(c[:, 0], c[:, 1], c='y', s=100, marker='x')
 	plt.title('Clusters based on latitude and longitude')
 	plt.xlabel('latitude')
 	plt.ylabel('longitude')
 	plot=convert_fig_to_html(fig)
-	
 	return render_template("clus_o.html",data=plot.decode('utf8'))
 	
 
@@ -441,6 +469,23 @@ def pie_chart():
 	plot=convert_fig_to_html(fig)
 	
 	return render_template("pie.html",data=plot.decode('utf8'))
+	
+@app.route('/linegraph')
+def linegraph():
+    query = "SELECT latitude,longitude FROM Earthquake "
+    con = sql.connect("database.db")
+    cur = con.cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+    y = pd.DataFrame(rows)
+    X = y.dropna()
+    fig = plt.figure()
+    plt.plot(X[0], X[1],marker ='o',color='r',markeredgecolor='b')
+    plt.title('Clusters based on latitude and longitude')
+    plt.xlabel('latitude')
+    plt.ylabel('longitude')
+    plot = convert_fig_to_html(fig)
+    return render_template("pie.html",data=plot.decode('utf8'))	
 	
 	
 
