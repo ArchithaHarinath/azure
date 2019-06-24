@@ -186,7 +186,7 @@ def pie_chart():
 
 	return render_template("pie.html",data=plot.decode('utf8'))
 		
-def convert_fig_to_html(fig):
+	def convert_fig_to_html(fig):
 	
 	figfile = BytesIO()
 	plt.savefig(figfile, format='png')
