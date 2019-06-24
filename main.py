@@ -369,7 +369,7 @@ def pie_chart():
 			dest = i+n
 			if dest > 80:
 				dest = 80
-			query = "SELECT count(*) FROM vote where (Voted*1.0/TotalPop)*100 between "+str(i)+ " and "+dest
+			query = "SELECT count(*) FROM vote where (Voted*1.0/TotalPop)*100 between "+str(i)+ " and "+str(dest)
 			con = sql.connect("database.db") 
 			cur = con.cursor()
 			cur.execute(query)
