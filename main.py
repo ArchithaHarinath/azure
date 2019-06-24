@@ -366,7 +366,10 @@ def pie_chart():
 		main_result = []
 		result = []
 		for i in range(40,80,n):
-			query = "SELECT count(*) FROM vote where (Voted*1.0/TotalPop)*100 between "+str(i)+ " and "+str(i+n)
+			dest = i+n
+			if dest > 80:
+				dest = 80
+			query = "SELECT count(*) FROM vote where (Voted*1.0/TotalPop)*100 between "+str(i)+ " and "+dest
 			con = sql.connect("database.db") 
 			cur = con.cursor()
 			cur.execute(query)
