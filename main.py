@@ -374,7 +374,7 @@ def pie_chart():
 			cur = con.cursor()
 			cur.execute(query)
 			rows = cur.fetchone()
-			t = str(i)+ " - "+str(i+n)
+			t = str(i)+ " - "+str(dest)
 			result.append(t)
 			main_result.append(rows)
 		y=pd.DataFrame(main_result)
